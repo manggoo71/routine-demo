@@ -161,9 +161,10 @@ img{display:block;-webkit-user-drag:none}
 .mb button:active{transform:scale(.95)}
 .mb .sec{background:rgba(4,8,12,.08);padding:8px 12px;width:72px}
 .mb .pri{background:var(--primary);color:#fcfcff}
-.cd{align-self:center;min-width:12px;margin-right:2px;text-align:center;font-weight:600;font-size:15px;line-height:20px;color:var(--mute);font-variant-numeric:tabular-nums}
-.cd.tick{animation:cdtick .45s var(--ease)}
-@keyframes cdtick{from{opacity:0;transform:translateY(-6px) scale(1.25)}to{opacity:1;transform:none}}
+.mb .pri.count{display:inline-flex;align-items:center;justify-content:center;gap:.28em;white-space:nowrap}
+.cdn{display:inline-block;width:.62em;text-align:center;font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+.cdn.tick{animation:cdtick .45s var(--ease)}
+@keyframes cdtick{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
 .hl-list{max-height:574px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;padding-bottom:20px;scrollbar-width:none;font-size:14px;line-height:19px}
 .hl-list::-webkit-scrollbar{display:none}
 .bub{background:var(--tint);border-radius:calc(16px*var(--sq));padding:16px;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .5s var(--ease);transition-delay:calc(var(--i)*55ms + 120ms)}
@@ -203,11 +204,14 @@ img{display:block;-webkit-user-drag:none}
 @keyframes blink{0%,55%{opacity:1}56%,100%{opacity:0}}
 
 /* ───────── Phone: done screen ───────── */
-#done{position:absolute;left:0;top:0;width:360px;bottom:48px;background:var(--bg);z-index:12;transform:translateX(100%);transition:transform .62s var(--ease-io);box-shadow:-18px 0 40px rgba(0,0,0,0)}
-#phone.done #done{transform:none;box-shadow:-18px 0 40px rgba(0,0,0,.08)}
+#done{position:absolute;left:0;top:0;width:360px;bottom:48px;background:var(--bg);z-index:12;transform:translateX(100%);transition:transform .62s var(--ease-io)}
+#phone.done #done{transform:none}
+#phone.done #bottom{opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
 #done .ab{position:absolute;left:0;right:0;top:28px;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-weight:700;font-size:20px;line-height:27px}
 #btnDone{font-weight:600;font-size:17px;line-height:23px;height:40px;display:flex;align-items:center}
-#dbody{position:absolute;left:0;right:0;top:88px;bottom:0;overflow-y:auto;padding:10px 10px 30px;display:flex;flex-direction:column;align-items:center;gap:20px;scrollbar-width:none;-webkit-mask-image:linear-gradient(#000 0,#000 78%,transparent 100%);mask-image:linear-gradient(#000 0,#000 78%,transparent 100%)}
+#dbody{position:absolute;left:0;right:0;top:88px;bottom:0;overflow-y:auto;padding:10px 10px 20px;display:flex;flex-direction:column;align-items:center;gap:20px;scrollbar-width:none;}
+#dbody{-webkit-mask-image:linear-gradient(#000 0,#000 calc(100% - 96px),rgba(0,0,0,0) 100%);mask-image:linear-gradient(#000 0,#000 calc(100% - 96px),rgba(0,0,0,0) 100%);-webkit-mask-size:100% calc(100% + 96px);mask-size:100% calc(100% + 96px);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:0 0;mask-position:0 0;transition:-webkit-mask-position .35s,mask-position .35s}
+#dbody.more{-webkit-mask-position:0 100%;mask-position:0 100%}
 #dbody::-webkit-scrollbar{display:none}
 .dtop{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
 .dicon{position:relative;background:var(--surface);border-radius:46px;padding:8px}
@@ -329,7 +333,7 @@ body.nopanel #showPanel:hover,body.nopanel #showPanel:focus-visible{opacity:1}
   <div id="phoneWrap"><div id="device" class="sq"><div id="phone" class="sq" data-f="ph"></div></div></div>
 
   <aside id="panel" aria-live="polite">
-    <div class="eyebrow">SMARTTHINGS · AI ROUTINE ASSISTANT <span class="ver">V3</span></div>
+    <div class="eyebrow">SMARTTHINGS · AI ROUTINE ASSISTANT <span class="ver">V3.1</span></div>
     <h1>말 한마디로 완성하는 자동화 루틴</h1>
     <p class="lead">조건과 동작을 하나씩 고르던 If/Then 빌더를, 문장으로 요청하면 AI가 채워주는 흐름으로 바꾼 시나리오입니다.</p>
     <div class="prog"><b id="pNum">01 <span>/ 11</span></b><div class="segs" id="segs"></div></div>
@@ -469,13 +473,14 @@ function idle(){ field('ph'); q('#tt').textContent=''; cls('noMic',false); cls('
 let cdTimer=null;
 function hideReco(){ const my=RUN, r=q('#reco'); if(INSTANT){ r.classList.add('gone'); return; } setTimeout(()=>{ if(my===RUN) r.classList.add('gone'); },340); }
 function openMsg(text,btns,count){ clearTimeout(cdTimer); q('#msgText').textContent=text;
-  q('#msgBtns').innerHTML=(count?'<span class="cd" id="mCd">3</span>':'')+btns.map(b=>`<button class="${b.pri?'pri':'sec'}" id="${b.id}">${b.t}</button>`).join(''); q('#msg').classList.add('open');
+  q('#msgBtns').innerHTML=btns.map(b=>(count&&b.pri)?`<button class="pri count" id="${b.id}"><span class="cdn" id="mCd">${CD}</span><span>${b.t}</span></button>`:`<button class="${b.pri?'pri':'sec'}" id="${b.id}">${b.t}</button>`).join(''); q('#msg').classList.add('open');
   if(count&&!INSTANT) startCount(); }
-function startCount(){ const my=RUN; let n=3;
+const CD=5;
+function startCount(){ const my=RUN; let n=CD;
   const done=()=>{ if(my!==RUN) return; if(STEPS[cur].target==='#mOk'){ if(armed) advance(true); else cdTimer=setTimeout(done,150); } else if(running) cdTimer=setTimeout(done,150); else closeMsg(); };
   const tick=()=>{ if(my!==RUN) return; n--; const e=q('#mCd'); if(!e) return;
     if(n>0){ e.textContent=n; e.classList.remove('tick'); void e.offsetWidth; e.classList.add('tick'); cdTimer=setTimeout(tick,1000); } else done(); };
-  cdTimer=setTimeout(tick,1350); }
+  cdTimer=setTimeout(tick,1000); }
 const closeMsg=()=>{ clearTimeout(cdTimer); q('#msg').classList.remove('open'); };
 const stat={sent:0,tap:0,ai:0};
 function bump(k,n=1){ stat[k]+=n; renderStats(); }
@@ -589,7 +594,7 @@ const STEPS=[
      fillR2(); bump('ai',3); r2.querySelector('.lbl').classList.remove('hid'); await wait(900); idle(); await wait(380);
      openMsg(TXT.done2,[{t:'OK',id:'mOk',pri:1}],true); await wait(700); } },
  { tap:'입력창을 터치하세요', target:'#field',
-   title:'같은 입력창에서 대화로 수정', body:'완료 메시지는 3초 카운트 후 자동으로 닫히며 OK를 눌러 바로 닫을 수도 있습니다. 새 메시지를 입력하기 위해 입력창을 누르면 키보드가 올라오며 커서가 활성화됩니다. 방금 만든 두 번째 루틴을 수정하는 문장을 입력합니다.',
+   title:'같은 입력창에서 대화로 수정', body:'완료 메시지는 5초 카운트 후 자동으로 닫히며 OK를 눌러 바로 닫을 수도 있습니다. 새 메시지를 입력하기 위해 입력창을 누르면 키보드가 올라오며 커서가 활성화됩니다. 방금 만든 두 번째 루틴을 수정하는 문장을 입력합니다.',
    point:'생성과 수정이 하나의 입력창에서 이어져, 별도 편집 화면을 익힐 필요가 없습니다.',
    async run(){ closeMsg(); await wait(180); cls('kb',true); field('typed'); await wait(620); await typeText(TXT.say2); bump('sent'); await wait(250); } },
  { tap:'보내기 버튼을 터치하세요', target:'#act',
@@ -598,8 +603,8 @@ const STEPS=[
    async run(){ cls('kb',false); const r2=q('#r2'); r2.classList.add('busy'); busy('두 번째 루틴 수정 중...'); await wait(1800);
      const h2=addActionsR2(); bump('ai',2); scrollTo(r2.offsetTop+h2+88-511); await wait(950); idle(); await wait(360);
      openMsg(TXT.done3,[{t:'OK',id:'mOk',pri:1}],true); await wait(700); } },
- { tap:'OK를 터치하세요 (3초 뒤 자동으로 닫힘)', target:'#mOk',
-   title:'변경 결과 확인', body:'완료 메시지는 3 → 2 → 1 카운트 후 자동으로 닫히고, OK를 눌러 바로 닫을 수도 있습니다. 빌더에는 조명·TV·콘센트를 끄는 동작 3개가 순서대로 정리되어 있습니다.',
+ { tap:'OK를 터치하세요 (5초 뒤 자동으로 닫힘)', target:'#mOk',
+   title:'변경 결과 확인', body:'완료 메시지는 5 → 4 → 3 → 2 → 1 카운트 후 자동으로 닫히고, OK를 눌러 바로 닫을 수도 있습니다. 빌더에는 조명·TV·콘센트를 끄는 동작 3개가 순서대로 정리되어 있습니다.',
    point:'AI가 만든 결과가 기존 수동 빌더와 같은 형태로 남아, 언제든 직접 고칠 수 있습니다.',
    async run(){ closeMsg(); await wait(450); addChips(); await wait(350); } },
  { tap:'화면을 스크롤해 본 뒤, 입력창 좌측의 대화내역 버튼을 터치하세요', target:'#hbtn',
@@ -616,12 +621,15 @@ const STEPS=[
    async run(){ forceFloat=true; phone.querySelectorAll('.aichip').forEach(c=>c.classList.add('out')); setFocus(0); cls('saving',true); q('#st').textContent='루틴 보완 후 저장 중...'; field('st'); cls('hasHist',false); cls('noMic',true); await wait(450);
      scrollTo(62); await wait(900); complementR1(); bump('ai',1); await wait(1900); q('#r1trig').classList.remove('hl'); await wait(250);
      scrollTo(q('#r2').offsetTop-24); await wait(950); complementR2(); bump('ai',3); await wait(2300); q('#r2or').classList.remove('hl'); await wait(450);
-     q('#dbody').scrollTop=0; cls('done',true); await wait(1100); } },
+     q('#dbody').scrollTop=0; cls('done',true); doneFade(); await wait(1100); } },
  { tap:'Done을 터치하세요', target:'#btnDone',
    title:'저장 완료', body:'루틴 이름이 자동으로 정해지고, 두 루틴의 If/Then이 문장으로 요약됩니다. Done을 누르면 데모가 처음으로 돌아갑니다.',
    point:'문장 2개와 몇 번의 터치만으로 조건 8개·동작 4개로 이뤄진 루틴 묶음이 완성됐습니다.',
    async run(){ await wait(150); } }
 ];
+
+function doneFade(){ const d=q('#dbody'); if(d) d.classList.toggle('more', d.scrollTop+d.clientHeight < d.scrollHeight-4); }
+phone.addEventListener('scroll',e=>{ if(e.target.id==='dbody') doneFade(); },true);
 
 /* ───────── 진행 제어 ───────── */
 let cur=0, armed=false, running=false;
